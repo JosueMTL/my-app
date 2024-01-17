@@ -16,6 +16,7 @@ export default function EmojiPicker({ isVisible, children, onClose }) {
         </Modal>
     );
 }
+
 const styles = StyleSheet.create({
     modalContent: {
         height: '25%',
@@ -39,12 +40,5 @@ const styles = StyleSheet.create({
     title: {
         color: '#fff',
         fontSize: 16,
-    },
-    pickerContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 50,
-        paddingVertical: 20,
     },
 });
