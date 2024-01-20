@@ -40,7 +40,7 @@ Ahora presento informe actualizado:
 
 ### ¿Qué problemas específicos de rendimiento o mantenibilidad se identificaron en la aplicación original?
 
-En la aplicación original, se identificaron problemas de rendimiento en el componente EmojiSticker.js, específicamente relacionados con la gestión de eventos y la animación. Además, el código en algunos componentes era difícil de entender y mantener debido a su estructura complicada.
+En la aplicación original, se identificaron problemas de rendimiento en el componente EmojiSticker.js, específicamente relacionados con la gestión de eventos y la animación. Además, el código en algunos componentes era difícil de entender y mantener debido a su estructura complicada. (para comprender que queria agregar mas stickers pero no pude asi que quede con el codigo original )
 
 ### ¿Cómo se aseguró que el refactoring no afectara negativamente la funcionalidad existente?
 
