@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { StyleSheet, FlatList, Image, Platform, Pressable } from 'react-native';
+import React from 'react';
+import { StyleSheet, FlatList, Image, Pressable } from 'react-native';
 
 export default function EmojiList({ onSelect, onCloseModal }) {
-    const [emoji] = useState([
+    const [emoji] = React.useState([
         require('../assets/images/emoji1.png'),
         require('../assets/images/emoji2.png'),
         require('../assets/images/emoji3.png'),
@@ -14,20 +14,19 @@ export default function EmojiList({ onSelect, onCloseModal }) {
     return (
         <FlatList
             horizontal
-            showsHorizontalScrollIndicator={Platform.OS === 'web' ? true : false}
+            showsHorizontalScrollIndicator={false}
             data={emoji}
             contentContainerStyle={styles.listContainer}
-            renderItem={({ item, index }) => {
-                return (
-                    <Pressable
-                        onPress={() => {
-                            onSelect(item);
-                            onCloseModal();
-                        }}>
-                        <Image source={item} key={index} style={styles.image} />
-                    </Pressable>
-                );
-            }}
+            renderItem={({ item, index }) => (
+                <Pressable
+                    onPress={() => {
+                        onSelect(item);
+                        onCloseModal();
+                    }}
+                >
+                    <Image source={item} key={index} style={styles.image} />
+                </Pressable>
+            )}
         />
     );
 }
@@ -40,10 +39,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        maxHeight: 120,
     },
     image: {
-        width: 100,
-        height: 100,
+        width: 80,
+        height: 80,
         marginRight: 20,
     },
 });

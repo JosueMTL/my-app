@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Platform } from 'react-native';
+import { StyleSheet, View, Platform, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as MediaLibrary from 'expo-media-library';
@@ -23,24 +23,34 @@ export default function App() {
   const [pickedEmoji, setPickedEmoji] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const [status, requestPermission] = MediaLibrary.usePermissions();
   const imageRef = useRef();
 
-  if (status === null) {
-    requestPermission();
-  }
+  useEffect(() => {
+    requestPermissions();
+  }, []);
+
+  const requestPermissions = async () => {
+    const [status] = await MediaLibrary.requestPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission required', 'Please allow access to media library to proceed.');
+    }
+  };
 
   const pickImageAsync = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,      
-      quality: 1,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        quality: 1,
+      });
 
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
-      setShowAppOptions(true);
-    } else {
-      alert('You did not select any image.');
+      if (!result.canceled) {
+        setSelectedImage(result.assets[0].uri);
+        setShowAppOptions(true);
+      } else {
+        Alert.alert('No image selected', 'You did not select any image.');
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -57,35 +67,44 @@ export default function App() {
   };
 
   const onSaveImageAsync = async () => {
-    if (Platform.OS !== 'web') {
-      try {
-        const localUri = await captureRef(imageRef, {
-          height: 440,
-          quality: 1,
-        });
-        await MediaLibrary.saveToLibraryAsync(localUri);
-        if (localUri) {
-          alert('Saved!');
-        }
-      } catch (e) {
-        console.log(e);
+    try {
+      const localUri = await captureRef(imageRef, {
+        height: 440,
+        quality: 1,
+      });
+
+      const fileName = prompt('Enter a name for the image', 'sticker-smash.jpeg');
+
+      if (fileName) {
+        await saveToLibrary(localUri, fileName);
+        Alert.alert('Saved!', 'Image saved successfully.');
+      } else {
+        Alert.alert('Invalid name', 'Please enter a valid name for the image.');
       }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const saveToLibrary = async (localUri, fileName) => {
+    if (Platform.OS !== 'web') {
+      await MediaLibrary.saveToLibraryAsync(localUri, fileName);
     } else {
-        domtoimage
-          .toJpeg(imageRef.current, {
-            quality: 0.95,
-            width: 320,
-            height: 440,
-          })
-          .then(dataUrl => {
-            let link = document.createElement('a');
-            link.download = 'sticker-smash.jpeg';
-            link.href = dataUrl;
-            link.click();
-          })
-          .catch(e => {
-            console.log(e);
-          });
+      domtoimage
+        .toJpeg(imageRef.current, {
+          quality: 0.95,
+          width: 320,
+          height: 440,
+        })
+        .then(dataUrl => {
+          let link = document.createElement('a');
+          link.download = fileName;
+          link.href = dataUrl;
+          link.click();
+        })
+        .catch(error => {
+          console.error(error);
+        });
     }
   };
 
@@ -113,9 +132,9 @@ export default function App() {
         </View>
       ) : (
         <View style={styles.footerContainer}>
-          <Button theme="primary" label="Elije una Foto" onPress={pickImageAsync} />
+          <Button theme="primary" label="Choose an Image" onPress={pickImageAsync} />
           <Button
-            label="Usar esta Foto" onPress={() => setShowAppOptions(true)}
+            label="Use this Image" onPress={() => setShowAppOptions(true)}
           />
         </View>
       )}
@@ -134,7 +153,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imageContainer: {
-    flex:1, 
+    flex: 1,
     paddingTop: 58
   },
   footerContainer: {
